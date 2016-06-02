@@ -11,6 +11,6 @@ var server = api.net.createServer(function(socket) {
   console.log('Connected: ' + socket.localAddress);
   socket.write(JSON.stringify(task));
   socket.on('data', function(data) {
-    console.log('Data received (by server) from worker ' + socket.localAddress + ' : ' + data);
+    console.log('Data received (by server) from worker: ' + data);
   });
 }).listen(2000);
