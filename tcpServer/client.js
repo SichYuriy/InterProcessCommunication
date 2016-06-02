@@ -10,6 +10,7 @@ socket.connect({
   host: '127.0.0.1',
 }, function() {
   console.log("Worker is ready to take a task");
+  socket.write(JSON.stringify('ready for the next task'));
   socket.on('data', function(data) {
     console.log("Worker received " + data);
     taskForWorker = JSON.parse(data);
@@ -19,6 +20,8 @@ socket.connect({
     }
     console.log("Worker: task complete");
     socket.write(JSON.stringify(taskForWorker));
+    console.log("Worker is ready to take the next task");
+    socket.write(JSON.stringify('ready for the next task'));
   });
 
 });
