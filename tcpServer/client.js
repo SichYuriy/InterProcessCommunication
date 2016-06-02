@@ -3,16 +3,22 @@ global.api = api;
 api.net = require('net');
 
 var socket = new api.net.Socket();
-var user;
+var  taskForWorker;
 
 socket.connect({
   port: 2000,
   host: '127.0.0.1',
 }, function() {
-  socket.write('Hello from client');
+  console.log("Worker " + socket.loclaAdress + " is ready to take a task");
   socket.on('data', function(data) {
-    user = JSON.parse(data);
-    console.log('Data received (by client): ' + data);
-    console.log('Age of ' + user.name + ' is ' + user.age);
+    console.log("Worker " + socket.localAddress + " + received " + data);
+    taskForWorker = JSON.parse(data);
+    for (var i = 0; i < taskForWorker.length; i++)
+    {
+      taskForWorker[i] *= 2;
+    }
+    console.log("Worker " + socket.localAddress + ": task complete");
+    socket.write(JSON.stringify(taskForWorker));
   });
+
 });
