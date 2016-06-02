@@ -7,6 +7,9 @@ var results = [];
 var taskForWorkerLength = 4;
 var tempTaskIndex = 0;
 var hasNextTask = true;
+var tempTaskId = 0;
+var countTasks = Math.ceil(task.length / taskForWorkerLength);
+var completedTasks = 0;
 
 
 var server = api.net.createServer(function(socket) {
@@ -21,22 +24,38 @@ var server = api.net.createServer(function(socket) {
         var nextTask
         if (tempTaskIndex + taskForWorkerLength < task.length)
         {
-          nextTask = task.slice(tempTaskIndex, tempTaskIndex + taskForWorkerLength);
+          nextTask = {
+            id: tempTaskId,
+            task: task.slice(tempTaskIndex, tempTaskIndex + taskForWorkerLength)
+          };
           tempTaskIndex += taskForWorkerLength;
+          tempTaskId++;
         } else {
-          nextTask = task.slice(tempTaskIndex, task.length);
+          nextTask = {
+            id: tempTaskId,
+            task: task.slice(tempTaskIndex, task.length)
+          };
           hasNextTask = false;
         }
         socket.write(JSON.stringify(nextTask));
       }
     } else {
-      for (var i = 0; i < data.length; i++) {
-        results.push(data[i]);
-      }
-      if (results.length == task.length)
+      console.log("Server received: " + data.id + " - " + data.task);
+      results[data.id] = data.task;
+      completedTasks++;
+      if (completedTasks == countTasks)
       {
+        results = joinResults();
         console.log("Results:" + results);
       }
     }
   });
 }).listen(2000);
+
+function joinResults() {
+  var res = [];
+  for (var i = 0; i < countTasks; i++) {
+    results[i].forEach((x)=>{res.push(x)});
+  }
+  return res;
+}
